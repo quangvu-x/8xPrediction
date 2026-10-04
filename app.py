@@ -62,15 +62,44 @@ def sidebar():
                         "- Video upload dùng model nhỏ (YOLOv8n) nên kém chính xác hơn trận mẫu")
 
 
+MAX_MOMENTS = 8
+
+
+def moments(frames, team_colors, names):
+    """Nút "Khoảnh khắc" = các lần đổi quyền kiểm soát; bấm để tua video tới giây đó."""
+    pt = frames.loc[frames["possession_team"] != -1, ["time_s", "possession_team"]]
+    ch = pt[pt["possession_team"] != pt["possession_team"].shift()].iloc[1:].head(MAX_MOMENTS)
+    ui.section("Khoảnh khắc", "⏱")
+    if ch.empty:
+        st.caption("Không có lần đổi quyền kiểm soát nào.")
+        return
+    st.caption("Bấm để tua video tới lúc đội nhận bóng.")
+    css = []
+    for i, team in enumerate(ch["possession_team"].astype(int)):
+        r, g, b = team_colors[team]
+        fg = "#07130C" if r + g + b > 382 else "#FFFFFF"   # chữ tối trên nền sáng, chữ trắng trên nền tối
+        css.append(f".st-key-moment_{i} button{{background:rgb({r},{g},{b});color:{fg};"
+                   f"border-color:rgb({r},{g},{b})}}")
+    st.markdown(f"<style>{''.join(css)}</style>", unsafe_allow_html=True)
+    cols = st.columns(4)
+    for i, (t, team) in enumerate(zip(ch["time_s"], ch["possession_team"].astype(int))):
+        cols[i % 4].button(f"⏱ {t:.1f}s → {names[team]}", key=f"moment_{i}", width="stretch",
+                           on_click=st.session_state.__setitem__, args=("seek", float(t)))
+
+
 # ------------------------------------------------------------------ các tab
-def tab_overview(stats, d):
+def tab_overview(stats, d, frames):
     p0, p1 = stats["possession_pct"]
     names = team_names()
     ui.scoreboard(p0, p1, *stats["team_colors"], names=names)
     left, right = st.columns([3, 2], gap="large")
     with left:
         video = d / "output.mp4"
-        st.video(video.read_bytes()) if video.exists() else st.warning("Chưa có output.mp4.")
+        if video.exists():
+            st.video(video.read_bytes(), start_time=int(st.session_state.get("seek", 0)))
+        else:
+            st.warning("Chưa có output.mp4.")
+        moments(frames, stats["team_colors"], names)
     with right:
         a, b = st.columns(2)
         with a:
@@ -197,7 +226,7 @@ def main():
         return
 
     with tabs[0]:
-        tab_overview(stats, d)
+        tab_overview(stats, d, frames)
     with tabs[1]:
         tab_replay(stats, tracks, frames)
     with tabs[2]:
