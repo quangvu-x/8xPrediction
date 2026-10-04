@@ -34,6 +34,11 @@ def current_dir():
     return C.RESULTS_DIR
 
 
+def team_names():
+    """Tên 2 đội hiển thị trên web (sidebar sửa được; ô trống -> "Team 0/1")."""
+    return [st.session_state.get(f"team_name_{t}", "").strip() or f"Team {t}" for t in (0, 1)]
+
+
 # ------------------------------------------------------------------ sidebar
 def sidebar():
     with st.sidebar:
@@ -43,6 +48,10 @@ def sidebar():
                           index=options.index("Video của bạn") if st.session_state.get("source") == "upload"
                           and "Video của bạn" in options else 0)
         st.session_state["source"] = "upload" if choice == "Video của bạn" else "demo"
+        st.markdown("### 👕 Tên đội")
+        for t in (0, 1):
+            st.session_state.setdefault(f"team_name_{t}", C.TEAM_NAMES[t])
+            st.text_input(f"Đội {t} ({'áo sáng hơn' if t == 0 else 'áo tối hơn'})", key=f"team_name_{t}")
         with st.expander("Cách hệ thống hoạt động"):
             st.markdown("1. **Phát hiện** cầu thủ & bóng (YOLO)\n2. **Theo dõi** ID qua từng frame\n"
                         "3. **Chia đội** theo màu áo (KMeans)\n4. **Giữ bóng** = cầu thủ gần bóng nhất\n"
@@ -56,7 +65,8 @@ def sidebar():
 # ------------------------------------------------------------------ các tab
 def tab_overview(stats, d):
     p0, p1 = stats["possession_pct"]
-    ui.scoreboard(p0, p1, *stats["team_colors"])
+    names = team_names()
+    ui.scoreboard(p0, p1, *stats["team_colors"], names=names)
     left, right = st.columns([3, 2], gap="large")
     with left:
         video = d / "output.mp4"
@@ -69,10 +79,10 @@ def tab_overview(stats, d):
             ui.stat_card("Đổi quyền", stats["possession_changes"], "số lần đổi đội giữ bóng", "🔁")
         a, b = st.columns(2)
         with a:
-            ui.stat_card("Cầu thủ T0", stats["n_players"][0], "ID khác nhau", "👕")
+            ui.stat_card(f"Cầu thủ {names[0]}", stats["n_players"][0], "ID khác nhau", "👕")
         with b:
-            ui.stat_card("Cầu thủ T1", stats["n_players"][1], "ID khác nhau", "👕")
-        st.plotly_chart(make_possession_donut(stats["possession_pct"], stats["team_colors"]),
+            ui.stat_card(f"Cầu thủ {names[1]}", stats["n_players"][1], "ID khác nhau", "👕")
+        st.plotly_chart(make_possession_donut(stats["possession_pct"], stats["team_colors"], names),
                         width="stretch")
     with st.expander("⬇️ Tải dữ liệu"):
         c1, c2, c3 = st.columns(3)
@@ -86,25 +96,28 @@ def tab_replay(stats, tracks, frames):
     st.caption("Bấm ▶ hoặc kéo thanh trượt. Viền vàng = cầu thủ đang giữ bóng. Rê chuột để xem ID.")
     step = st.select_slider("Độ mượt", options=[1, 2, 3, 5], value=2,
                             format_func=lambda s: {1: "Tối đa", 2: "Cao", 3: "Vừa", 5: "Nhẹ"}[s])
-    st.plotly_chart(VX.make_replay(tracks, stats, frames, step=step), width="stretch")
+    st.plotly_chart(VX.make_replay(tracks, stats, frames, step=step, names=team_names()), width="stretch")
 
 
 def tab_trend(stats, frames):
     ui.section("Momentum theo thời gian", "📊")
     win = st.slider("Độ dài mỗi cửa sổ (giây)", 1.0, 5.0, 2.0, 0.5)
-    st.plotly_chart(VX.make_momentum(frames, stats["team_colors"], win, stats["fps"]), width="stretch")
+    st.plotly_chart(VX.make_momentum(frames, stats["team_colors"], win, stats["fps"], team_names()), width="stretch")
     ui.section("% kiểm soát tích luỹ", "📈")
-    st.plotly_chart(VX.make_timeline_with_events(frames, stats["team_colors"]), width="stretch")
+    st.plotly_chart(VX.make_timeline_with_events(frames, stats["team_colors"], team_names()), width="stretch")
 
 
 def tab_players(stats, tracks):
+    names = team_names()
     summary = VX.player_summary(tracks, stats["fps"])
-    team = st.segmented_control("Đội", ["Tất cả", "Team 0", "Team 1"], default="Tất cả")
-    view = summary if team in (None, "Tất cả") else summary[summary["Đội"] == int(team[-1])]
+    team = st.segmented_control("Đội", ["Tất cả", 0, 1], default="Tất cả",
+                                format_func=lambda t: t if t == "Tất cả" else names[t])
+    view = summary if team in (None, "Tất cả") else summary[summary["Đội"] == team]
     left, right = st.columns([2, 3], gap="large")
     with left:
         ui.section("Bảng cầu thủ", "👟")
-        st.dataframe(view.sort_values("giây giữ bóng", ascending=False), hide_index=True, width="stretch",
+        st.dataframe(view.assign(**{"Đội": view["Đội"].map(dict(enumerate(names)))})
+                     .sort_values("giây giữ bóng", ascending=False), hide_index=True, width="stretch",
                      column_config={"giây giữ bóng": st.column_config.ProgressColumn(
                          "giây giữ bóng", min_value=0, max_value=float(max(summary["giây giữ bóng"].max(), 0.1)),
                          format="%.1f s")})
@@ -115,8 +128,10 @@ def tab_players(stats, tracks):
 
 
 def tab_heatmap(stats, tracks):
-    team = st.radio("Chọn đội", [0, 1], format_func=lambda t: f"Team {t}", horizontal=True)
-    st.plotly_chart(make_heatmap(tracks, team, stats["width"], stats["height"]), width="stretch")
+    names = team_names()
+    team = st.radio("Chọn đội", [0, 1], format_func=lambda t: names[t], horizontal=True)
+    st.plotly_chart(make_heatmap(tracks, team, stats["width"], stats["height"], name=names[team]),
+                    width="stretch")
     st.caption("Camera di chuyển nên heatmap phản ánh vị trí trên khung hình, không phải sân thật.")
 
 
