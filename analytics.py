@@ -39,7 +39,7 @@ def interpolate_ball(raw, meta):
     ball = filter_ball_outliers(ball, meta["width"], meta["fps"], C.BALL_MAX_SPEED_RATIO)
 
     detected_pct = 100.0 * len(ball) / n if n else 0.0
-    s = ball.reindex(range(n))
+    s = ball.reindex(range(n)).astype(float)       # ép kiểu số: video không có bóng vẫn nội suy được
 
     # Chỉ nội suy khoảng trống "bên trong" và ngắn hơn hoặc bằng max_gap frame.
     max_gap = max(1, int(round(fps * C.BALL_INTERP_MAX_GAP_S)))
@@ -235,6 +235,8 @@ def export_results(players, ball_pos, holder, poss, cum0, cum1, changes,
 # ---------------------------------------------------------------- main
 def main():
     raw, meta = load_inputs()
+    if (raw["cls"] == "player").sum() == 0:
+        sys.exit("[LỖI] Không thấy cầu thủ nào trong video - không chia được đội.")
     ball_pos, detected_pct = interpolate_ball(raw, meta)
 
     players = raw[raw["cls"] == "player"].copy()
