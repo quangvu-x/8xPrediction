@@ -14,7 +14,7 @@ import ui
 import viz_extra as VX
 from viz import make_heatmap, make_possession_donut
 
-st.set_page_config(page_title="Football Analytics", page_icon="⚽", layout="wide")
+st.set_page_config(page_title="8xPrediction", page_icon="⚽", layout="wide")
 ui.inject_css()
 ONNX_MODEL = C.ROOT / "models" / "yolov8n.onnx"
 NEEDED = ["stats.json", "tracks.csv", "frames.csv"]
@@ -308,11 +308,11 @@ def main():
     sidebar()
     d = current_dir()
     is_upload = st.session_state.get("source") == "upload"
-    ui.hero("FOOTBALL ANALYTICS",
+    ui.hero("8xPrediction",
             "Phát hiện cầu thủ và bóng bằng YOLO, chia đội theo màu áo, đo kiểm soát bóng và phát lại "
             "chiến thuật — ngay trên trình duyệt.",
             ["YOLOv8", "ByteTrack / IoU tracker", "KMeans", "Streamlit",
-             "🎥 Video của bạn" if is_upload else "🏟️ Trận mẫu"])
+             "🎥 Video của bạn" if is_upload else "🏟️ Trận mẫu"], accent_prefix="8x")
 
     tabs = st.tabs(["🏟️ Tổng quan", "🎬 Phát lại", "📈 Diễn biến", "👟 Cầu thủ", "🔥 Heatmap", "📤 Tự phân tích"])
     with tabs[5]:
