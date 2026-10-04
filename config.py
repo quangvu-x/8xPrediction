@@ -44,6 +44,9 @@ JERSEY_X = (0.25, 0.75)
 GRASS_HUE = (35, 85)
 GRASS_MIN_SAT = 40
 
+# ---------- web ----------
+TEAM_NAMES = ["Man City", "Man United"]  # tên hiển thị trên web, theo thứ tự team 0 / team 1
+
 # ---------- analytics.py ----------
 HOLD_DIST_RATIO = 0.04      # khoảng cách giữ bóng tối đa = ratio x chiều rộng video
 MIN_TRACK_FRAMES = 5        # track ngắn hơn không tham gia KMeans
