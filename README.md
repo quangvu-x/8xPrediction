@@ -4,7 +4,7 @@ Xử lý một clip bóng đá 10-15 giây: phát hiện và theo dõi cầu th�
 tính % kiểm soát bóng → xuất video có chú thích → hiển thị trên web Streamlit.
 Web có thêm tab "📤 Tự phân tích": người xem tự upload video ngắn để chạy phân tích.
 
-**Link web:** https://8xprediction-xdapcygbbmkaspmubstbkr.streamlit.app/ · **Người thực hiện:** [ĐIỀN TÊN]
+**Link web:** https://8xprediction-xdapcygbbmkaspmubstbkr.streamlit.app/ 
 
 ## Kiến trúc
 
