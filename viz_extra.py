@@ -25,8 +25,9 @@ def _layout(fig, width, height, title=None):
     return fig
 
 
-def make_replay(tracks, stats, frames_df=None, step=2):
+def make_replay(tracks, stats, frames_df=None, step=2, names=None):
     """Animation vị trí cầu thủ theo khung hình. step: lấy 1 frame mỗi `step` frame cho nhẹ."""
+    names = names or ("Team 0", "Team 1")
     W, H, fps = stats["width"], stats["height"], stats["fps"]
     colors = stats["team_colors"]
     keep = sorted(tracks["frame"].unique())[::step]
@@ -39,13 +40,13 @@ def make_replay(tracks, stats, frames_df=None, step=2):
         for team in (0, 1):
             p = g[(g["cls"] == "player") & (g["team"] == team)]
             out.append(go.Scatter(
-                x=p["x"], y=p["y"], mode="markers+text", name=f"Team {team}",
+                x=p["x"], y=p["y"], mode="markers+text", name=names[team],
                 text=p["track_id"].astype(str), textposition="top center",
                 textfont=dict(size=9, color="#ffffff"),
                 marker=dict(size=np.where(p["has_ball"] == 1, 18, 12), color=rgb(colors[team]),
                             line=dict(width=np.where(p["has_ball"] == 1, 3, 1),
                                       color=["#FFD60A" if h else "#111" for h in p["has_ball"]])),
-                hovertemplate="ID %{text}<extra>Team " + str(team) + "</extra>"))
+                hovertemplate="ID %{text}<extra>" + names[team] + "</extra>"))
         b = g[g["cls"] == "ball"]
         out.append(go.Scatter(x=b["x"], y=b["y"], mode="markers", name="Bóng",
                               marker=dict(size=10, color="#ffffff", symbol="circle",
@@ -70,8 +71,9 @@ def make_replay(tracks, stats, frames_df=None, step=2):
     return _layout(fig, W, H)
 
 
-def make_momentum(frames_df, team_colors, window_s=2.0, fps=25.0):
-    """Mỗi cột = % thời gian Team 0 (lên) / Team 1 (xuống) giữ bóng trong cửa sổ window_s giây."""
+def make_momentum(frames_df, team_colors, window_s=2.0, fps=25.0, names=None):
+    """Mỗi cột = % thời gian đội 0 (lên) / đội 1 (xuống) giữ bóng trong cửa sổ window_s giây."""
+    names = names or ("Team 0", "Team 1")
     f = frames_df[frames_df["possession_team"] != -1].copy()
     if f.empty:
         return go.Figure()
@@ -79,23 +81,24 @@ def make_momentum(frames_df, team_colors, window_s=2.0, fps=25.0):
     g = f.groupby("win")["possession_team"].agg(lambda s: (s == 0).mean() * 100).reset_index()
     g.columns = ["win", "p0"]
     fig = go.Figure()
-    fig.add_bar(x=g["win"], y=g["p0"], name="Team 0", marker_color=rgb(team_colors[0]),
-                hovertemplate="%{x:.0f}s: %{y:.0f}%<extra>Team 0</extra>")
-    fig.add_bar(x=g["win"], y=-(100 - g["p0"]), name="Team 1", marker_color=rgb(team_colors[1]),
-                customdata=100 - g["p0"], hovertemplate="%{x:.0f}s: %{customdata:.0f}%<extra>Team 1</extra>")
+    fig.add_bar(x=g["win"], y=g["p0"], name=names[0], marker_color=rgb(team_colors[0]),
+                hovertemplate="%{x:.0f}s: %{y:.0f}%<extra>" + names[0] + "</extra>")
+    fig.add_bar(x=g["win"], y=-(100 - g["p0"]), name=names[1], marker_color=rgb(team_colors[1]),
+                customdata=100 - g["p0"], hovertemplate="%{x:.0f}s: %{customdata:.0f}%<extra>" + names[1] + "</extra>")
     fig.update_layout(barmode="relative", bargap=0.15, paper_bgcolor="rgba(0,0,0,0)",
-                      plot_bgcolor="rgba(0,0,0,0)", yaxis=dict(range=[-100, 100], title="← Team 1 | Team 0 →",
+                      plot_bgcolor="rgba(0,0,0,0)", yaxis=dict(range=[-100, 100], title=f"← {names[1]} | {names[0]} →",
                                                                zeroline=True, zerolinecolor="#888"),
                       xaxis_title="Thời gian (giây)", margin=dict(l=10, r=10, t=10, b=10),
                       legend=dict(orientation="h", y=1.1))
     return fig
 
 
-def make_timeline_with_events(frames_df, team_colors):
+def make_timeline_with_events(frames_df, team_colors, names=None):
+    names = names or ("Team 0", "Team 1")
     fig = go.Figure()
     for t in (0, 1):
         fig.add_scatter(x=frames_df["time_s"], y=frames_df[f"cum_pct_team{t}"], mode="lines",
-                        name=f"Team {t}", line=dict(color=rgb(team_colors[t]), width=3))
+                        name=names[t], line=dict(color=rgb(team_colors[t]), width=3))
     pt = frames_df["possession_team"]
     changes = frames_df[(pt != pt.shift()) & (pt != -1) & (pt.shift() != -1)]
     for _, r in changes.iterrows():
