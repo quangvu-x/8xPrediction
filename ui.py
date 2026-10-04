@@ -67,13 +67,14 @@ def hero(title, subtitle, badges=()):
                 f'<p>{html.escape(subtitle)}</p>{b}</div>', unsafe_allow_html=True)
 
 
-def scoreboard(p0, p1, c0, c1, label="Kiểm soát bóng"):
+def scoreboard(p0, p1, c0, c1, label="Kiểm soát bóng", names=("Team 0", "Team 1")):
+    n0, n1 = (html.escape(n) for n in names)
     st.markdown(f"""
 <div class="score">
   <div class="score-top">
-    <span><span class="dot" style="background:{_rgb(c0)}"></span>TEAM 0 · {p0:.1f}%</span>
+    <span><span class="dot" style="background:{_rgb(c0)}"></span>{n0} · {p0:.1f}%</span>
     <span class="score-mid">{html.escape(label)}</span>
-    <span>{p1:.1f}% · TEAM 1<span class="dot" style="background:{_rgb(c1)};margin:0 0 0 8px"></span></span>
+    <span>{p1:.1f}% · {n1}<span class="dot" style="background:{_rgb(c1)};margin:0 0 0 8px"></span></span>
   </div>
   <div class="bar"><div style="width:{p0}%;background:{_rgb(c0)}"></div>
        <div style="width:{p1}%;background:{_rgb(c1)}"></div></div>
