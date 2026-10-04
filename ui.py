@@ -8,9 +8,12 @@ import streamlit as st
 
 CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;800&display=swap');
-:root { --accent:#22C55E; --ball:#FFD60A; --card:#0F2418; --line:rgba(255,255,255,.08); --muted:#9DB8A6; }
-html, body, [class*="css"] { font-family: 'Inter', system-ui, sans-serif; }
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;600;700&display=swap');
+:root { --accent:#22C55E; --ball:#FFD60A; --card:#0F2418; --line:rgba(255,255,255,.08); --muted:#9DB8A6;
+  --display:'Barlow Condensed','Arial Narrow',sans-serif;   /* tiêu đề, số lớn - có đủ dấu tiếng Việt */
+  --body:'Be Vietnam Pro',system-ui,sans-serif; }
+/* Font nội dung chỉ áp cho chữ, KHÔNG áp mọi phần tử (giữ font icon của Streamlit) */
+.stApp p, .stApp label, .stMarkdown, .stTabs button p, .stTabs [data-testid="stTab"] p, .card, .score { font-family:var(--body); }
 .block-container { padding-top: 1.2rem; max-width: 1280px; }
 
 /* HERO: dải sân cỏ có vạch giữa sân */
@@ -20,7 +23,7 @@ html, body, [class*="css"] { font-family: 'Inter', system-ui, sans-serif; }
     linear-gradient(90deg, transparent calc(50% - 1px), rgba(255,255,255,.18) calc(50% - 1px), rgba(255,255,255,.18) calc(50% + 1px), transparent calc(50% + 1px)),
     repeating-linear-gradient(90deg, #14532d 0 80px, #166534 80px 160px);
   box-shadow: 0 10px 30px rgba(0,0,0,.35); }
-.hero h1 { font-family:'Bebas Neue', sans-serif; font-size:3rem; letter-spacing:2px; margin:0; color:#fff;
+.hero h1 { font-family:var(--display); font-weight:800; letter-spacing:1px; text-transform:none; font-size:3rem; margin:0; color:#fff;
   text-shadow:0 3px 12px rgba(0,0,0,.5); }
 .hero p { margin:.3rem 0 .8rem; color:#e6ffe9; max-width:720px; }
 .badge { display:inline-block; padding:4px 12px; margin:0 6px 6px 0; border-radius:999px; font-size:.8rem;
@@ -28,8 +31,8 @@ html, body, [class*="css"] { font-family: 'Inter', system-ui, sans-serif; }
 
 /* SCOREBOARD possession */
 .score { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px 20px; margin-bottom:14px; }
-.score-top { display:flex; justify-content:space-between; align-items:center; font-family:'Bebas Neue'; font-size:2.4rem; }
-.score-mid { color:var(--muted); font-family:'Inter'; font-size:.8rem; letter-spacing:2px; text-transform:uppercase; }
+.score-top { display:flex; justify-content:space-between; align-items:center; font-family:var(--display); font-weight:800; font-size:2.4rem; }
+.score-mid { color:var(--muted); font-family:var(--body); font-weight:400; font-size:.8rem; letter-spacing:2px; text-transform:uppercase; }
 .bar { display:flex; height:14px; border-radius:999px; overflow:hidden; margin-top:8px; box-shadow:inset 0 0 0 1px var(--line); }
 .bar > div { transition: width 1.2s ease; }
 .dot { display:inline-block; width:14px; height:14px; border-radius:50%; margin-right:8px; vertical-align:middle;
@@ -40,10 +43,10 @@ html, body, [class*="css"] { font-family: 'Inter', system-ui, sans-serif; }
   transition: transform .15s ease, border-color .15s ease; }
 .card:hover { transform: translateY(-3px); border-color: var(--accent); }
 .card .lbl { color:var(--muted); font-size:.78rem; text-transform:uppercase; letter-spacing:1px; }
-.card .val { font-family:'Bebas Neue'; font-size:2.3rem; line-height:1.1; color:#fff; }
+.card .val { font-family:var(--display); font-weight:800; font-size:2.3rem; line-height:1.1; color:#fff; }
 .card .sub { color:var(--muted); font-size:.8rem; }
 .tip { cursor:help; color:var(--muted); font-size:.8rem; margin-left:4px; }
-.sec { font-family:'Bebas Neue'; font-size:1.6rem; letter-spacing:1px; margin:10px 0 4px; }
+.sec { font-family:var(--display); font-weight:700; text-transform:uppercase; letter-spacing:1px; font-size:1.6rem; margin:10px 0 4px; }
 
 /* Tabs */
 /* Streamlit 1.65: tablist/tab dùng role + data-testid (không còn data-baseweb) */
