@@ -340,7 +340,7 @@ def main():
         tab_players(stats, tracks)
     with tabs[4]:
         tab_heatmap(stats, tracks)
-    st.caption("Tham chiếu: \"Build an AI/ML Football Analysis system with YOLO, OpenCV, and Python\"
+    st.caption("Tham chiếu: \"Build an AI/ML Football Analysis system with YOLO, OpenCV, and Python\". "
               )
 
 
