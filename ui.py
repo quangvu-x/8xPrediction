@@ -82,9 +82,15 @@ def _rgb(c):
     return f"rgb({int(c[0])},{int(c[1])},{int(c[2])})"
 
 
-def hero(title, subtitle, badges=()):
+def hero(title, subtitle, badges=(), accent_prefix=""):
+    """accent_prefix: phần đầu tiêu đề tô vàng bóng (vd "8x" trong "8xPrediction")."""
     b = "".join(f'<span class="badge">{html.escape(x)}</span>' for x in badges)
-    st.markdown(f'<div class="hero"><h1>{html.escape(title)}</h1>'
+    if accent_prefix and title.startswith(accent_prefix):
+        rest = title[len(accent_prefix):]
+        h1 = f'<span style="color:#FFD60A">{html.escape(accent_prefix)}</span>{html.escape(rest)}'
+    else:
+        h1 = html.escape(title)
+    st.markdown(f'<div class="hero"><h1>{h1}</h1>'
                 f'<p>{html.escape(subtitle)}</p>{b}</div>', unsafe_allow_html=True)
 
 
