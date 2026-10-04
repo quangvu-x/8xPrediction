@@ -1,0 +1,10 @@
+# Dành cho máy cá nhân / Colab: chạy detect, analytics, render
+ultralytics>=8.1
+supervision>=0.18,<0.31   # sv.ByteTrack bị đánh dấu deprecated từ 0.28 và dự kiến gỡ ở 0.31
+opencv-python>=4.8
+scikit-learn>=1.3
+pandas>=2.0
+numpy
+imageio-ffmpeg>=0.4.9
+streamlit>=1.50
+plotly>=5.18

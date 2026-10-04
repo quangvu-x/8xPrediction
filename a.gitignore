@@ -1,0 +1,14 @@
+# Python / môi trường
+venv/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+# Dữ liệu đầu vào và weights (không commit)
+input/
+*.pt
+# Kết quả trung gian (không commit)
+results/raw.csv
+results/raw_render.mp4
+results/_*.html
+# KHÔNG bỏ qua: results/output.mp4, tracks.csv, frames.csv, stats.json, meta.json
