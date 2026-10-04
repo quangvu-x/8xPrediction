@@ -46,10 +46,6 @@ GRASS_MIN_SAT = 40
 
 # ---------- web ----------
 TEAM_NAMES = ["Man City", "Man United"]  # tên hiển thị trên web, theo thứ tự team 0 / team 1
-WARN_MIN_BALL_PCT = 40      # web cảnh báo khi ball_detected_pct thấp hơn mức này
-WARN_MAX_PLAYERS = 14       # web cảnh báo khi n_players của một đội lớn hơn mức này
-UPLOAD_MAX_VIDEO_S = 600    # video upload dài hơn (giây) bị từ chối: cắt ngắn trước khi upload
-UPLOAD_SEC_PER_FRAME = (0.6, 2.5)  # ƯỚC LƯỢNG giây xử lý/frame trên Streamlit Cloud (GUIDELINE B4, chưa đo)
 
 # ---------- analytics.py ----------
 HOLD_DIST_RATIO = 0.04      # khoảng cách giữ bóng tối đa = ratio x chiều rộng video
