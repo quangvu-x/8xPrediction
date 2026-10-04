@@ -6,31 +6,31 @@
   "team_colors": [
     [
       121,
-      144,
-      178
+      152,
+      196
     ],
     [
-      123,
-      70,
-      64
+      130,
+      61,
+      60
     ]
   ],
   "possession_pct": [
-    75.4,
-    24.6
+    75.6,
+    24.4
   ],
   "n_players": [
     8,
     11
   ],
-  "ball_detected_pct": 93.3,
+  "ball_detected_pct": 92.1,
   "possession_changes": 9,
   "per_player": [
     {
       "track_id": 1,
       "team": 0,
       "frames_seen": 276,
-      "frames_with_ball": 160
+      "frames_with_ball": 161
     },
     {
       "track_id": 2,
@@ -48,7 +48,7 @@
       "track_id": 4,
       "team": 1,
       "frames_seen": 900,
-      "frames_with_ball": 11
+      "frames_with_ball": 9
     },
     {
       "track_id": 5,
@@ -84,13 +84,13 @@
       "track_id": 10,
       "team": 0,
       "frames_seen": 381,
-      "frames_with_ball": 8
+      "frames_with_ball": 10
     },
     {
       "track_id": 12,
       "team": 1,
       "frames_seen": 661,
-      "frames_with_ball": 39
+      "frames_with_ball": 38
     },
     {
       "track_id": 13,
@@ -114,7 +114,7 @@
       "track_id": 16,
       "team": 1,
       "frames_seen": 383,
-      "frames_with_ball": 30
+      "frames_with_ball": 31
     },
     {
       "track_id": 17,
@@ -138,12 +138,6 @@
       "track_id": 20,
       "team": 1,
       "frames_seen": 1,
-      "frames_with_ball": 0
-    },
-    {
-      "track_id": 21,
-      "team": 1,
-      "frames_seen": 2,
       "frames_with_ball": 0
     },
     {
@@ -171,12 +165,6 @@
       "frames_with_ball": 0
     },
     {
-      "track_id": 26,
-      "team": 1,
-      "frames_seen": 1,
-      "frames_with_ball": 0
-    },
-    {
       "track_id": 27,
       "team": 0,
       "frames_seen": 769,
@@ -186,12 +174,6 @@
       "track_id": 28,
       "team": 1,
       "frames_seen": 9,
-      "frames_with_ball": 0
-    },
-    {
-      "track_id": 29,
-      "team": 1,
-      "frames_seen": 1,
       "frames_with_ball": 0
     },
     {
@@ -216,7 +198,7 @@
       "track_id": 33,
       "team": 1,
       "frames_seen": 640,
-      "frames_with_ball": 27
+      "frames_with_ball": 26
     },
     {
       "track_id": 34,
@@ -249,16 +231,10 @@
       "frames_with_ball": 1
     },
     {
-      "track_id": 39,
-      "team": 1,
-      "frames_seen": 1,
-      "frames_with_ball": 0
-    },
-    {
       "track_id": 40,
       "team": 0,
       "frames_seen": 582,
-      "frames_with_ball": 132
+      "frames_with_ball": 138
     },
     {
       "track_id": 41,
@@ -285,12 +261,6 @@
       "frames_with_ball": 0
     },
     {
-      "track_id": 45,
-      "team": 0,
-      "frames_seen": 2,
-      "frames_with_ball": 0
-    },
-    {
       "track_id": 46,
       "team": 0,
       "frames_seen": 2,
@@ -306,12 +276,6 @@
       "track_id": 48,
       "team": 0,
       "frames_seen": 1,
-      "frames_with_ball": 0
-    },
-    {
-      "track_id": 49,
-      "team": 1,
-      "frames_seen": 2,
       "frames_with_ball": 0
     },
     {
@@ -333,60 +297,6 @@
       "frames_with_ball": 7
     },
     {
-      "track_id": 53,
-      "team": 0,
-      "frames_seen": 5,
-      "frames_with_ball": 0
-    },
-    {
-      "track_id": 54,
-      "team": 1,
-      "frames_seen": 4,
-      "frames_with_ball": 0
-    },
-    {
-      "track_id": 55,
-      "team": 0,
-      "frames_seen": 4,
-      "frames_with_ball": 0
-    },
-    {
-      "track_id": 56,
-      "team": 0,
-      "frames_seen": 3,
-      "frames_with_ball": 0
-    },
-    {
-      "track_id": 57,
-      "team": 1,
-      "frames_seen": 1,
-      "frames_with_ball": 0
-    },
-    {
-      "track_id": 58,
-      "team": 0,
-      "frames_seen": 7,
-      "frames_with_ball": 0
-    },
-    {
-      "track_id": 59,
-      "team": 1,
-      "frames_seen": 186,
-      "frames_with_ball": 0
-    },
-    {
-      "track_id": 60,
-      "team": 0,
-      "frames_seen": 343,
-      "frames_with_ball": 0
-    },
-    {
-      "track_id": 62,
-      "team": 1,
-      "frames_seen": 374,
-      "frames_with_ball": 0
-    },
-    {
       "track_id": 63,
       "team": 1,
       "frames_seen": 5,
@@ -399,12 +309,6 @@
       "frames_with_ball": 0
     },
     {
-      "track_id": 65,
-      "team": 1,
-      "frames_seen": 251,
-      "frames_with_ball": 0
-    },
-    {
       "track_id": 66,
       "team": 1,
       "frames_seen": 268,
@@ -414,7 +318,7 @@
       "track_id": 67,
       "team": 1,
       "frames_seen": 238,
-      "frames_with_ball": 14
+      "frames_with_ball": 11
     },
     {
       "track_id": 68,
@@ -432,24 +336,6 @@
       "track_id": 70,
       "team": 0,
       "frames_seen": 82,
-      "frames_with_ball": 0
-    },
-    {
-      "track_id": 71,
-      "team": 1,
-      "frames_seen": 1,
-      "frames_with_ball": 0
-    },
-    {
-      "track_id": 72,
-      "team": 1,
-      "frames_seen": 25,
-      "frames_with_ball": 0
-    },
-    {
-      "track_id": 73,
-      "team": 1,
-      "frames_seen": 9,
       "frames_with_ball": 0
     },
     {
