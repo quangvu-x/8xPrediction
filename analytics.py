@@ -12,6 +12,7 @@ import pandas as pd
 from sklearn.cluster import KMeans
 
 import config as C
+from accuracy_utils import assign_teams_robust, filter_ball_outliers
 
 
 # ---------------------------------------------------------------- đọc dữ liệu
@@ -35,6 +36,7 @@ def interpolate_ball(raw, meta):
     ball["bx"] = (ball["x1"] + ball["x2"]) / 2
     ball["by"] = (ball["y1"] + ball["y2"]) / 2
     ball = ball.groupby("frame")[["bx", "by"]].first()
+    ball = filter_ball_outliers(ball, meta["width"], meta["fps"], C.BALL_MAX_SPEED_RATIO)
 
     detected_pct = 100.0 * len(ball) / n if n else 0.0
     s = ball.reindex(range(n))
@@ -54,20 +56,25 @@ def interpolate_ball(raw, meta):
 
 
 # ---------------------------------------------------------------- phân đội
+def drop_referees(players):
+    """Loại trọng tài: track có màu áo trung vị gần REFEREE_COLORS không được chia đội."""
+    if not C.REFEREE_COLORS:
+        return players
+    med = players.dropna(subset=["r", "g", "b"]).groupby("track_id")[["r", "g", "b"]].median()
+    ref = np.array(C.REFEREE_COLORS, dtype=float)
+    d_ref = np.linalg.norm(med.values[:, None, :] - ref[None, :, :], axis=2)
+    ref_ids = med.index[d_ref.min(axis=1) < C.REFEREE_COLOR_DIST].astype(int).tolist()
+    if ref_ids:
+        print(f"Loại trọng tài : track {ref_ids}")
+    return players[~players["track_id"].isin(ref_ids)]
+
+
 def assign_teams(players):
-    """KMeans 2 cụm trên màu áo trung vị của từng track. Team 0 = áo sáng hơn."""
+    """(Bản cũ, RGB) KMeans 2 cụm trên màu áo trung vị của từng track. Team 0 = áo sáng hơn."""
+    players = drop_referees(players)
     colored = players.dropna(subset=["r", "g", "b"])
     agg = colored.groupby("track_id").agg(r=("r", "median"), g=("g", "median"),
                                           b=("b", "median"), n=("frame", "count"))
-
-    # Loại trọng tài: track có màu áo gần REFEREE_COLORS không được chia đội
-    if C.REFEREE_COLORS:
-        ref = np.array(C.REFEREE_COLORS, dtype=float)
-        d_ref = np.linalg.norm(agg[["r", "g", "b"]].values[:, None, :] - ref[None, :, :], axis=2)
-        is_ref = d_ref.min(axis=1) < C.REFEREE_COLOR_DIST
-        if is_ref.any():
-            print(f"Loại trọng tài : track {agg.index[is_ref].astype(int).tolist()}")
-        agg = agg[~is_ref]
 
     fit = agg[agg["n"] >= C.MIN_TRACK_FRAMES]
     if len(fit) < 2:
@@ -88,6 +95,20 @@ def assign_teams(players):
     team_of = dict(zip(agg.index.astype(int), teams.astype(int)))
     team_colors = np.round(centers[order]).astype(int).clip(0, 255).tolist()
     return team_of, team_colors
+
+
+def print_excluded(players, excluded):
+    """In các track bị loại khỏi 2 đội: track_id, số frame, màu RGB trung vị, lý do."""
+    if not excluded:
+        print("Loại khỏi đội  : không có")
+        return
+    info = players.groupby("track_id").agg(n=("frame", "nunique"), r=("r", "median"),
+                                           g=("g", "median"), b=("b", "median"))
+    print(f"Loại khỏi đội  : {len(excluded)} track")
+    for tid in sorted(excluded, key=lambda t: -info.loc[t, "n"]):
+        r = info.loc[tid]
+        print(f"  track {tid:>4} | {int(r.n):>4} frame | RGB ({r.r:.0f}, {r.g:.0f}, {r.b:.0f})"
+              f" | {excluded[tid]}")
 
 
 # ---------------------------------------------------------------- giữ bóng
@@ -218,7 +239,23 @@ def main():
 
     players = raw[raw["cls"] == "player"].copy()
     players["track_id"] = players["track_id"].astype(int)
-    team_of, team_colors = assign_teams(players)
+    players = drop_referees(players)
+    try:
+        team_of, team_colors, excluded = assign_teams_robust(
+            players, C.TEAM_CLUSTERS, C.MIN_TRACK_FRAMES, 1.0,
+            C.TEAM_OUTLIER_FACTOR, C.EXCLUDE_TRACK_IDS)
+    except ValueError:
+        sys.exit("[LỖI] Có ít hơn 2 cầu thủ có màu áo - không chia được đội. "
+                 "Kiểm tra lại raw.csv hoặc chọn clip khác.")
+    # Thủ môn mặc áo khác màu đội -> gán đội thủ công, bỏ khỏi danh sách loại
+    present = set(players["track_id"].unique())
+    for tid, team in C.GOALKEEPER_TEAM.items():
+        if tid in present:
+            team_of[int(tid)] = int(team)
+            excluded.pop(int(tid), None)
+            print(f"Thủ môn        : track {tid} -> Team {team}")
+    print_excluded(players, excluded)
+    # Track không có trong team_of (người không phải cầu thủ) bị bỏ TRƯỚC khi tìm người giữ bóng
     players["team"] = players["track_id"].map(team_of)
     players = players.dropna(subset=["team"])
     players["team"] = players["team"].astype(int)

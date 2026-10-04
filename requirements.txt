@@ -1,4 +1,10 @@
-# CHỈ dành cho web (Streamlit Community Cloud). KHÔNG thêm ultralytics/torch/opencv vào đây.
+# Web (Streamlit Community Cloud) - v2 có chức năng tự upload video.
+# KHÔNG thêm ultralytics/torch/supervision/opencv-python (bản có GUI) vào đây.
 streamlit>=1.50
 pandas>=2.0
 plotly>=5.18
+numpy
+scikit-learn>=1.3
+opencv-python-headless>=4.8
+onnxruntime>=1.17
+imageio-ffmpeg>=0.4.9

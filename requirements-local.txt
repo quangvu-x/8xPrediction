@@ -8,3 +8,4 @@ numpy
 imageio-ffmpeg>=0.4.9
 streamlit>=1.50
 plotly>=5.18
+onnxruntime>=1.17

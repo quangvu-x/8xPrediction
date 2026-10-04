@@ -1,0 +1,9 @@
+[theme]
+base = "dark"
+primaryColor = "#22C55E"
+backgroundColor = "#07130C"
+secondaryBackgroundColor = "#0F2418"
+textColor = "#E8F5EC"
+
+[server]
+maxUploadSize = 60      # MB - video upload tối đa

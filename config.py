@@ -4,12 +4,13 @@ Mọi script (detect, analytics, render, check_outputs, make_mock, viz, app)
 đều import từ đây, nên muốn đổi tham số chỉ cần sửa ở MỘT chỗ.
 File này chỉ dùng thư viện chuẩn -> web Streamlit import được mà không cần torch/cv2.
 """
+import os
 from pathlib import Path
 
 # ---------- Đường dẫn ----------
 ROOT = Path(__file__).resolve().parent
 INPUT_DIR = ROOT / "input"
-RESULTS_DIR = ROOT / "results"
+RESULTS_DIR = Path(os.environ.get("FA_RESULTS_DIR", ROOT / "results"))
 
 DEFAULT_VIDEO = INPUT_DIR / "clip.mp4"
 TEST_VIDEO = INPUT_DIR / "clip3s.mp4"
@@ -47,12 +48,19 @@ GRASS_MIN_SAT = 40
 HOLD_DIST_RATIO = 0.04      # khoảng cách giữ bóng tối đa = ratio x chiều rộng video
 MIN_TRACK_FRAMES = 5        # track ngắn hơn không tham gia KMeans
 BALL_INTERP_MAX_GAP_S = 1.0 # khoảng trống bóng dài hơn (giây) thì không nội suy
+BALL_MAX_SPEED_RATIO = 1.5  # điểm bóng nhảy vọt > ratio x chiều rộng video mỗi giây -> loại
 MIN_POSSESSION_FRAMES = 10  # >1: đội mới phải giữ bóng liên tục N frame mới tính đổi quyền
 BALL_BOX_HALF = 6           # bbox giả của bóng trong tracks.csv = tâm +/- 6 px
-REFEREE_COLORS = [[56, 64, 45],    # trọng tài chính, đo trên clip3s.mp4
-                  [189, 198, 42]]  # trọng tài biên (vàng chanh), đo trên clip.mp4
+# Thiết lập THỦ CÔNG bên dưới chỉ đúng với trận mẫu; tắt khi chạy cho video người dùng upload
+_UPLOAD = "FA_RESULTS_DIR" in os.environ
+REFEREE_COLORS = [] if _UPLOAD else [[56, 64, 45],    # trọng tài chính, đo trên clip3s.mp4
+                                     [189, 198, 42]]  # trọng tài biên (vàng chanh), đo trên clip.mp4
 REFEREE_COLOR_DIST = 25     # track có màu gần REFEREE_COLORS hơn mức này -> trọng tài, bị loại
 MIN_PLAYER_SECONDS = 0.5    # track xuất hiện ngắn hơn (giây) không được đếm vào n_players
+TEAM_CLUSTERS = 4           # số nhóm màu; 2 nhóm có nhiều frame nhất = 2 đội, còn lại bị loại
+TEAM_OUTLIER_FACTOR = 3.0   # track cách tâm đội > factor x khoảng cách trung vị -> loại
+EXCLUDE_TRACK_IDS = []      # loại thủ công theo track_id (chỉ đúng với raw.csv hiện tại)
+GOALKEEPER_TEAM = {} if _UPLOAD else {6: 1}  # gán thủ môn thủ công {track_id: team} (chỉ đúng với raw.csv hiện tại)
 
 # ---------- render.py ----------
 MAX_WIDTH = 1280
