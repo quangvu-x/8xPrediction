@@ -42,13 +42,31 @@ html, body, [class*="css"] { font-family: 'Inter', system-ui, sans-serif; }
 .card .lbl { color:var(--muted); font-size:.78rem; text-transform:uppercase; letter-spacing:1px; }
 .card .val { font-family:'Bebas Neue'; font-size:2.3rem; line-height:1.1; color:#fff; }
 .card .sub { color:var(--muted); font-size:.8rem; }
+.tip { cursor:help; color:var(--muted); font-size:.8rem; margin-left:4px; }
 .sec { font-family:'Bebas Neue'; font-size:1.6rem; letter-spacing:1px; margin:10px 0 4px; }
 
 /* Tabs */
-.stTabs [data-baseweb="tab-list"] { gap:6px; }
-.stTabs [data-baseweb="tab"] { background:var(--card); border-radius:10px 10px 0 0; padding:8px 16px; }
+/* Streamlit 1.65: tablist/tab dùng role + data-testid (không còn data-baseweb) */
+.stTabs [role="tablist"] { gap:6px; }
+.stTabs [data-testid="stTab"] { background:var(--card); border-radius:10px 10px 0 0; padding:8px 16px; }
 .stTabs [aria-selected="true"] { background:#14532d; }
-@media (max-width: 640px) { .hero h1 { font-size:2.1rem; } .score-top { font-size:1.7rem; } }
+@media (max-width: 640px) {
+  .hero { padding:20px 18px; }
+  .hero h1 { font-size:2.1rem; }
+  /* Scoreboard: nhãn lên 1 dòng riêng, 2 đội chia 2 bên (tránh "MAN / UNITED" bị gãy dòng) */
+  .score { padding:12px 14px; }
+  .score-top { flex-wrap:wrap; row-gap:2px; font-size:1.3rem; line-height:1.15; }
+  .score-mid { order:-1; flex-basis:100%; text-align:center; font-size:.75rem; }
+  .score-top > span:not(.score-mid) { white-space:nowrap; }
+  .dot { width:11px; height:11px; margin-right:5px; }
+  /* Tabs: xuống dòng thay vì trượt ngang (2 tab cuối bị khuất ở 390px) */
+  .stTabs [role="tablist"] { flex-wrap:wrap; row-gap:6px; overflow-x:visible; }
+  .stTabs [data-testid="stTab"] { padding:6px 10px; border-radius:10px; }
+  .stTabs [aria-selected="true"] { box-shadow:inset 0 -2px 0 var(--accent); }
+  /* Plotly: nhãn ID cầu thủ 9px quá nhỏ trên điện thoại */
+  .js-plotly-plot .textpoint text { font-size:11px !important; }
+  .js-plotly-plot { overflow:hidden; }
+}
 </style>
 """
 
@@ -67,13 +85,18 @@ def hero(title, subtitle, badges=()):
                 f'<p>{html.escape(subtitle)}</p>{b}</div>', unsafe_allow_html=True)
 
 
-def scoreboard(p0, p1, c0, c1, label="Kiểm soát bóng", names=("Team 0", "Team 1")):
+def _tip(text):
+    """Biểu tượng ⓘ, rê chuột (hoặc chạm giữ) để xem giải thích."""
+    return f'<span class="tip" title="{html.escape(text, quote=True)}">ⓘ</span>' if text else ""
+
+
+def scoreboard(p0, p1, c0, c1, label="Kiểm soát bóng", names=("Team 0", "Team 1"), help=""):
     n0, n1 = (html.escape(n) for n in names)
     st.markdown(f"""
 <div class="score">
   <div class="score-top">
     <span><span class="dot" style="background:{_rgb(c0)}"></span>{n0} · {p0:.1f}%</span>
-    <span class="score-mid">{html.escape(label)}</span>
+    <span class="score-mid">{html.escape(label)}{_tip(help)}</span>
     <span>{p1:.1f}% · {n1}<span class="dot" style="background:{_rgb(c1)};margin:0 0 0 8px"></span></span>
   </div>
   <div class="bar"><div style="width:{p0}%;background:{_rgb(c0)}"></div>
@@ -81,8 +104,8 @@ def scoreboard(p0, p1, c0, c1, label="Kiểm soát bóng", names=("Team 0", "Tea
 </div>""", unsafe_allow_html=True)
 
 
-def stat_card(label, value, sub="", icon=""):
-    st.markdown(f'<div class="card"><div class="lbl">{icon} {html.escape(label)}</div>'
+def stat_card(label, value, sub="", icon="", help=""):
+    st.markdown(f'<div class="card"><div class="lbl">{icon} {html.escape(label)}{_tip(help)}</div>'
                 f'<div class="val">{html.escape(str(value))}</div>'
                 f'<div class="sub">{html.escape(sub)}</div></div>', unsafe_allow_html=True)
 
