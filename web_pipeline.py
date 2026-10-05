@@ -3,7 +3,9 @@ web_pipeline.py - Chạy pipeline cho video người dùng upload trên web.
 Mỗi lần upload có thư mục tạm riêng (không ghi đè results/ của bản demo).
 Các bước: chuẩn hoá video (cắt ≤ MAX_SECONDS, ≤ 720p, giảm fps) → detect_web → analytics → render.
 """
+import io
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -38,12 +40,18 @@ def prepare_video(src, dst, start_s=0.0, seconds=MAX_SECONDS, fps=12):
     subprocess.run(cmd, check=True)
 
 
-def run_uploaded(video_bytes, suffix=".mp4", start_s=0.0, seconds=MAX_SECONDS, fps=12,
+def run_uploaded(video_file, suffix=".mp4", start_s=0.0, seconds=MAX_SECONDS, fps=12,
                  conf=0.1, on_progress=None):
-    """Trả về đường dẫn thư mục kết quả (có meta/raw/tracks/frames/stats/output.mp4)."""
+    """Trả về đường dẫn thư mục kết quả (có meta/raw/tracks/frames/stats/output.mp4).
+    video_file: file-like (UploadedFile của Streamlit) - chép xuống đĩa theo khối 8 MB,
+    không tạo thêm bản sao bytes trong RAM. Vẫn nhận bytes để chạy thử từ dòng lệnh."""
+    if isinstance(video_file, (bytes, bytearray)):
+        video_file = io.BytesIO(video_file)
     work = Path(tempfile.mkdtemp(prefix="fa_"))
     src, clip = work / f"upload{suffix}", work / "clip.mp4"
-    src.write_bytes(video_bytes)
+    video_file.seek(0)
+    with open(src, "wb") as out:
+        shutil.copyfileobj(video_file, out, length=8 * 1024 * 1024)
     report = on_progress or (lambda p, msg: None)
 
     report(0.03, "Chuẩn hoá video...")
