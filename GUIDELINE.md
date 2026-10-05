@@ -122,7 +122,7 @@ Có class `player / goalkeeper / referee / ball` riêng → bóng chính xác h�
 ### B0. Kiến trúc
 
 ```
-Upload (≤60 MB) → web_pipeline.py: ffmpeg cắt ≤15 s, ≤720p, 8/12/25 fps
+Upload (≤200 MB) → web_pipeline.py: ffmpeg cắt ≤15 s, ≤720p, 8/12/25 fps
   → detect_web.py: YOLOv8n ONNX (onnxruntime) + SimpleTracker (IoU + Hungarian)
   → analytics.py (dùng CHUNG với bản local) → render.py → thư mục tạm riêng cho mỗi lần upload
   → dashboard hiển thị như trận mẫu
