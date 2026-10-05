@@ -6,4 +6,4 @@ secondaryBackgroundColor = "#0F2418"
 textColor = "#E8F5EC"
 
 [server]
-maxUploadSize = 60
+maxUploadSize = 200     # MB - video upload tối đa (khớp UPLOAD_MAX_MB trong config.py)
