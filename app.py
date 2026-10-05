@@ -196,9 +196,12 @@ def video_info(f):
     if key not in st.session_state:
         import tempfile
         import cv2                                      # import muộn: chỉ cần khi có file upload
+        import shutil
         with tempfile.NamedTemporaryFile(suffix=Path(f.name).suffix or ".mp4") as tmp:
-            tmp.write(f.getvalue())
+            f.seek(0)
+            shutil.copyfileobj(f, tmp, length=8 * 1024 * 1024)   # không gọi getvalue(): tránh nhân đôi RAM
             tmp.flush()
+            f.seek(0)
             cap = cv2.VideoCapture(tmp.name)
             ok, _ = cap.read()
             fps = cap.get(cv2.CAP_PROP_FPS) or 0
@@ -237,7 +240,7 @@ def tab_upload():
     if not ONNX_MODEL.exists():
         st.info("Chưa có models/yolov8n.onnx trong repo. Xem GUIDELINE.md mục B1 để tạo file này.")
         return
-    st.caption("Video được cắt tối đa 15 giây, thu nhỏ ≤ 720p để chạy được trên máy chủ miễn phí. "
+    st.caption(f"File tối đa {C.UPLOAD_MAX_MB} MB. Video được cắt tối đa 15 giây, thu nhỏ ≤ 720p để chạy được trên máy chủ miễn phí. "
                "Không lưu video của bạn sau phiên làm việc.")
     f = st.file_uploader("Chọn video (mp4, mov, avi, mkv)", type=["mp4", "mov", "avi", "mkv"])
 
@@ -274,7 +277,10 @@ def tab_upload():
     real_dur = max(0.0, min(dur, info["duration"] - start))
     n_frames = int(real_dur * fps)
     lo, hi = (n_frames * s for s in C.UPLOAD_SEC_PER_FRAME)
-    st.markdown(f"**{f.name}** · {len(f.getvalue()) / 1e6:.1f} MB · {info['w']}×{info['h']} · "
+    size_mb = f.size / 1e6
+    if size_mb > C.UPLOAD_BIG_MB:
+        st.info("File lớn: chỉ đoạn bạn chọn (tối đa 15 giây) được phân tích; tải lên có thể mất vài phút.")
+    st.markdown(f"**{f.name}** · {size_mb:.1f} MB · {info['w']}×{info['h']} · "
                 f"{info['duration']:.1f} s · {info['fps']:.0f} fps")
     st.caption(f"Sẽ xử lý {real_dur:.1f} s × {fps} fps = {n_frames} frame. "
                f"Thời gian **ước lượng** (chưa đo trên máy chủ): {lo / 60:.1f}–{hi / 60:.1f} phút.")
@@ -289,7 +295,7 @@ def tab_upload():
         from web_pipeline import run_uploaded          # import muộn: chỉ cần khi upload
         bar = st.progress(0.0, text="Bắt đầu...")
         try:
-            out = run_uploaded(f.getvalue(), Path(f.name).suffix or ".mp4", start, real_dur, fps, conf,
+            out = run_uploaded(f, Path(f.name).suffix or ".mp4", start, real_dur, fps, conf,
                                on_progress=lambda p, m: bar.progress(min(p, 1.0), text=m))
         except Exception as e:                         # phân loại lỗi, kèm log để người dùng gửi lại
             show_error(*classify_error(e), detail=str(e))
@@ -341,7 +347,7 @@ def main():
     with tabs[4]:
         tab_heatmap(stats, tracks)
     st.caption("Tham chiếu: \"Build an AI/ML Football Analysis system with YOLO, OpenCV, and Python\". "
-              )
+               )
 
 
 main()
