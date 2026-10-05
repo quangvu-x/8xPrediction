@@ -4,7 +4,7 @@ Xử lý một clip bóng đá 10-15 giây: phát hiện và theo dõi cầu th�
 tính % kiểm soát bóng → xuất video có chú thích → hiển thị trên web Streamlit.
 Web có thêm tab "📤 Tự phân tích": người xem tự upload video ngắn để chạy phân tích.
 
-**Link web:** https://8xprediction-xdapcygbbmkaspmubstbkr.streamlit.app/ 
+**Link web:** https://8xprediction-xdapcygbbmkaspmubstbkr.streamlit.app/ · **Người thực hiện:** [ĐIỀN TÊN]
 
 ## Kiến trúc
 
@@ -74,7 +74,7 @@ Thử tab "Tự phân tích" trên máy: `streamlit run app.py` → tab 📤 →
 | web_pipeline.py | Pipeline cho video upload trên web |
 | detect_web.py, onnx_detector.py, simple_tracker.py | Phát hiện bằng YOLOv8n ONNX + tracker IoU/Hungarian (bản web) |
 | models/yolov8n.onnx | Model cho tab upload (12 MB) |
-| .streamlit/config.toml | Theme tối và giới hạn upload 60 MB |
+| .streamlit/config.toml | Theme tối và giới hạn upload 200 MB |
 | GUIDELINE.md | Hướng dẫn nâng cấp v2 (độ chính xác, upload, giao diện) |
 
 ## Hợp đồng dữ liệu
