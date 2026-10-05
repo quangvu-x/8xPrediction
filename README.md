@@ -89,7 +89,9 @@ Thử tab "Tự phân tích" trên máy: `streamlit run app.py` → tab 📤 →
 
 ## Kết quả mẫu
 
-[CHÈN ẢNH CHỤP MÀN HÌNH]
+<img width="1439" height="709" alt="Screenshot 2026-10-05 at 17 34 09" src="https://github.com/user-attachments/assets/c1b445e0-5c90-4362-b15c-28bfd518ef26" />
+<img width="1437" height="706" alt="Screenshot 2026-10-05 at 17 36 06" src="https://github.com/user-attachments/assets/ed1ac75d-a006-414c-a414-715573643ae7" />
+<img width="1436" height="704" alt="Screenshot 2026-10-05 at 17 36 37" src="https://github.com/user-attachments/assets/6f0b1e7e-46c5-4eb7-b391-79872ad52f7b" />
 
 ## Nhật ký tinh chỉnh
 
